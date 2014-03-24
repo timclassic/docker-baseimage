@@ -1,4 +1,6 @@
-# A minimal Ubuntu base image modified for Docker-friendliness
+# A minimal Debian sid base image modified for Docker-friendliness
+
+This is a modified version of Baseimage-docker from Phusion, using Debian sid instead of Ubuntu as a base. Assume Debian instead of Ubuntu below.
 
 Baseimage-docker is a special [Docker](http://www.docker.io) image that is configured for correct use within Docker containers. It is Ubuntu, plus modifications for Docker-friendliness. You can use it as a base for your own Docker images.
 
