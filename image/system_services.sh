@@ -56,3 +56,5 @@ cp /build/runit/cron /etc/service/cron/run
 ## Remove useless cron entries.
 # Checks for lost+found and scans for mtab.
 #rm -f /etc/cron.daily/standard
+
+$minimal_apt_get_install anacron
