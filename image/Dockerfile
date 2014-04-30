@@ -1,7 +1,7 @@
 #FROM ubuntu:12.04
 FROM debian:sid
 
-MAINTAINER Phusion <info@phusion.nl>
+MAINTAINER Olivier Berger <olivier.berger@telecom-sudparis.eu>
 
 ENV HOME /root
 RUN mkdir /build
