@@ -6,7 +6,7 @@ set -x
 # ## Enable Ubuntu Universe.
 # echo deb http://archive.ubuntu.com/ubuntu precise main universe > /etc/apt/sources.list
 # echo deb http://archive.ubuntu.com/ubuntu precise-updates main universe >> /etc/apt/sources.list
-echo "deb http://http.debian.net/debian sid main" > /etc/apt/sources.list
+echo "deb http://http.debian.net/debian stable main" > /etc/apt/sources.list
 apt-get update
 
 ## Install HTTPS support for APT.

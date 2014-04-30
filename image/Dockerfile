@@ -1,7 +1,10 @@
-#FROM ubuntu:12.04
-FROM debian:sid
 
-MAINTAINER Phusion <info@phusion.nl>
+# Build with : docker build -t=YOURUSER/baseimage-docker-debian:7.4 .
+
+#FROM ubuntu:12.04
+FROM debian:7.4
+
+MAINTAINER Olivier Berger <olivier.berger@telecom-sudparis.eu>
 
 ENV HOME /root
 RUN mkdir /build
