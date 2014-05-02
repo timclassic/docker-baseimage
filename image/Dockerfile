@@ -1,5 +1,8 @@
+
+# Build with : docker build -t=YOURUSER/baseimage-docker-debian:7.4 .
+
 #FROM ubuntu:12.04
-FROM debian:sid
+FROM debian:7.4
 
 MAINTAINER Olivier Berger <olivier.berger@telecom-sudparis.eu>
 
