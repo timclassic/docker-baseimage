@@ -13,7 +13,7 @@ export INITRD=no
 mkdir -p /etc/container_environment
 echo -n no > /etc/container_environment/INITRD
 
-## Enable Ubuntu Universe and Multiverse.
+## Enable Debian sid main
 cp /build/sources.list /etc/apt/sources.list
 apt-get update
 
