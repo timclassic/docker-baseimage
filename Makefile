@@ -1,4 +1,4 @@
-NAME = phusion/baseimage
+NAME = stoo/baseimage
 VERSION = 0.9.12
 
 .PHONY: all build test tag_latest release ssh

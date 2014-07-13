@@ -4,7 +4,7 @@
 #FROM ubuntu:12.04
 FROM debian:7.4
 
-MAINTAINER Olivier Berger <olivier.berger@telecom-sudparis.eu>
+MAINTAINER Tim Stewart <tim@stoo.org>
 
 ENV HOME /root
 RUN mkdir /build
