@@ -3,6 +3,9 @@ set -e
 source /build/buildconfig
 set -x
 
+## Install Python 2.
+$minimal_apt_get_install python2.7
+
 ## Install init process.
 cp /build/bin/my_init /sbin/
 mkdir -p /etc/my_init.d
@@ -37,18 +40,20 @@ $minimal_apt_get_install openssh-server
 mkdir /var/run/sshd
 mkdir /etc/service/sshd
 cp /build/runit/sshd /etc/service/sshd/run
-cp /build/config/sshd_config /etc/ssh/sshd_config
+#cp /build/config/sshd_config /etc/ssh/sshd_config
+# comment-out pam_loginuid definition in /etc/pam.d/sshd so that root can login (see #726661)
+sed -i 's/^\([^#].*pam_loginuid\.so\)/#\1/g' /etc/pam.d/sshd
 cp /build/00_regen_ssh_host_keys.sh /etc/my_init.d/
 
 ## Install default SSH key for root and app.
-mkdir -p /root/.ssh
-chmod 700 /root/.ssh
-chown root:root /root/.ssh
-cp /build/insecure_key.pub /etc/insecure_key.pub
-cp /build/insecure_key /etc/insecure_key
-chmod 644 /etc/insecure_key*
-chown root:root /etc/insecure_key*
-cp /build/bin/enable_insecure_key /usr/sbin/
+# mkdir -p /root/.ssh
+# chmod 700 /root/.ssh
+# chown root:root /root/.ssh
+# cp /build/insecure_key.pub /etc/insecure_key.pub
+# cp /build/insecure_key /etc/insecure_key
+# chmod 644 /etc/insecure_key*
+# chown root:root /etc/insecure_key*
+# cp /build/bin/enable_insecure_key /usr/sbin/
 
 ## Install cron daemon.
 $minimal_apt_get_install cron
@@ -57,4 +62,6 @@ cp /build/runit/cron /etc/service/cron/run
 
 ## Remove useless cron entries.
 # Checks for lost+found and scans for mtab.
-rm -f /etc/cron.daily/standard
+#rm -f /etc/cron.daily/standard
+
+$minimal_apt_get_install anacron
