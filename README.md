@@ -1,21 +1,21 @@
-# A minimal Debian sid base image modified for Docker-friendliness
+# A minimal Debian wheezy base image modified for Docker-friendliness
 
-*This is a modified version of [Baseimage-docker from Phusion](https://github.com/phusion/baseimage-docker), using Debian sid instead of Ubuntu as a base. Assume Debian instead of Ubuntu in the rest of the documentation below. No warranty on the full compatibility with the Ubuntu original : I haven't tested all possible features.*
+*This is a modified version of [Baseimage-docker from Phusion](https://github.com/phusion/baseimage-docker), using Debian wheezy instead of Ubuntu as a base. The initial set of Debian changes are borrowed from [Olivier Berger's Debianized fork](https://github.com/olberger/baseimage-docker). I have merged Mr. Berger's changes into the latest version of baseimage-docker from Phusion and resolved conflicts. I plan to continue tracking Phusion's changes going forward. No warranty on the full compatibility with the Ubuntu original : I haven't tested all possible features.*
 
-Baseimage-docker is a special [Docker](http://www.docker.io) image that is configured for correct use within Docker containers. It is Ubuntu, plus modifications for Docker-friendliness, plus workarounds for [some Docker bugs](#workaroud_modifying_etc_hosts). You can use it as a base for your own Docker images.
+Baseimage-docker is a special [Docker](http://www.docker.io) image that is configured for correct use within Docker containers. It is Debian, plus modifications for Docker-friendliness, plus workarounds for [some Docker bugs](#workaroud_modifying_etc_hosts). You can use it as a base for your own Docker images.
 
 Baseimage-docker is available for pulling from [the Docker registry](https://index.docker.io/u/phusion/baseimage/)!
 
-### What are the problems with the stock Ubuntu base image?
+### What are the problems with the stock Debian base image?
 
-Ubuntu is not designed to be run inside Docker. Its init system, Upstart, assumes that it's running on either real hardware or virtualized hardware, but not inside a Docker container. But inside a container you don't want a full system anyway, you want a minimal system. But configuring that minimal system for use within a container has many strange corner cases that are hard to get right if you are not intimately familiar with the Unix system model. This can cause a lot of strange problems.
+Debian is not designed to be run inside Docker. Its init system, sysvinit, assumes that it's running on either real hardware or virtualized hardware, but not inside a Docker container. But inside a container you don't want a full system anyway, you want a minimal system. But configuring that minimal system for use within a container has many strange corner cases that are hard to get right if you are not intimately familiar with the Unix system model. This can cause a lot of strange problems.
 
 Baseimage-docker gets everything right. The "Contents" section describes all the things that it modifies.
 
 <a name="why_use"></a>
 ### Why use baseimage-docker?
 
-You can configure the stock `ubuntu` image yourself from your Dockerfile, so why bother using baseimage-docker?
+You can configure the stock `debian` image yourself from your Dockerfile, so why bother using baseimage-docker?
 
  * Configuring the base system for Docker-friendliness is no easy task. As stated before, there are many corner cases. By the time that you've gotten all that right, you've reinvented baseimage-docker. Using baseimage-docker will save you from this effort.
  * It reduces the time needed to write a correct Dockerfile. You won't have to worry about the base system and can focus on your stack and your app.
@@ -26,7 +26,7 @@ You can configure the stock `ubuntu` image yourself from your Dockerfile, so why
 
 **Related resources**:
   [Website](http://phusion.github.io/baseimage-docker/) |
-  [Github](https://github.com/phusion/baseimage-docker) |
+  [Github](https://github.com/timclassic/docker-baseimage) |
   [Docker registry](https://index.docker.io/u/phusion/baseimage/) |
   [Discussion forum](https://groups.google.com/d/forum/passenger-docker) |
   [Twitter](https://twitter.com/phusion_nl) |
@@ -70,14 +70,14 @@ You can configure the stock `ubuntu` image yourself from your Dockerfile, so why
 
 | Component        | Why is it included? / Remarks |
 | ---------------- | ------------------- |
-| Ubuntu 14.04 LTS | The base system. |
+| Debian 7.4 Wheezy | The base system. |
 | A **correct** init process | According to the Unix process model, [the init process](https://en.wikipedia.org/wiki/Init) -- PID 1 -- inherits all [orphaned child processes](https://en.wikipedia.org/wiki/Orphan_process) and must [reap them](https://en.wikipedia.org/wiki/Wait_(system_call)). Most Docker containers do not have an init process that does this correctly, and as a result their containers become filled with [zombie processes](https://en.wikipedia.org/wiki/Zombie_process) over time. <br><br>Furthermore, `docker stop` sends SIGTERM to the init process, which is then supposed to stop all services. Unfortunately most init systems don't do this correctly within Docker since they're built for hardware shutdowns instead. This causes processes to be hard killed with SIGKILL, which doesn't give them a chance to correctly deinitialize things. This can cause file corruption. <br><br>Baseimage-docker comes with an init process `/sbin/my_init` that performs both of these tasks correctly. |
 | Fixes APT incompatibilities with Docker | See https://github.com/dotcloud/docker/issues/1024. |
 | syslog-ng | A syslog daemon is necessary so that many services - including the kernel itself - can correctly log to /var/log/syslog. If no syslog daemon is running, a lot of important messages are silently swallowed. <br><br>Only listens locally. |
 | logrotate | Rotates and compresses logs on a regular basis. |
 | ssh server | Allows you to easily login to your container to inspect or administer things. <br><br>Password and challenge-response authentication are disabled by default. Only key authentication is allowed.<br><br>SSH access can be easily disabled if you so wish. Read on for instructions. |
 | cron | The cron daemon must be running for cron jobs to work. |
-| [runit](http://smarden.org/runit/) | Replaces Ubuntu's Upstart. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. |
+| [runit](http://smarden.org/runit/) | Replaces Debian's sysvinit. Used for service supervision and management. Much easier to use than SysV init and supports restarting daemons when they crash. Much easier to use and more lightweight than Upstart. |
 | `setuser` | A tool for running a command as another user. Easier to use than `su`, has a smaller attack vector than `sudo`, and unlike `chpst` this tool sets `$HOME` correctly. Available as `/sbin/setuser`. |
 | Workarounds for Docker bugs | [Learn more.](#workaroud_modifying_etc_hosts) |
 
@@ -95,7 +95,7 @@ Baseimage-docker *encourages* multiple processes through the use of runit.
 
 To look around in the image, run:
 
-    docker run --rm -t -i phusion/baseimage /sbin/my_init -- bash -l
+    docker run --rm -t -i stoo/baseimage /sbin/my_init -- bash -l
 
 You don't have to download anything manually. The above command will automatically pull the baseimage-docker image from the Docker registry.
 
@@ -105,13 +105,13 @@ You don't have to download anything manually. The above command will automatical
 <a name="getting_started"></a>
 ### Getting started
 
-The image is called `phusion/baseimage`, and is available on the Docker registry.
+The image is called `stoo/baseimage`, and is available on the Docker registry.
 
-    # Use phusion/baseimage as base image. To make your builds reproducible, make
+    # Use stoo/baseimage as base image. To make your builds reproducible, make
     # sure you lock down to a specific version, not to `latest`!
-    # See https://github.com/phusion/baseimage-docker/blob/master/Changelog.md for
+    # See https://github.com/timclassic/docker-baseimage/blob/master/Changelog.md for
     # a list of version numbers.
-    FROM phusion/baseimage:<VERSION>
+    FROM stoo/baseimage:<VERSION>
     
     # Set correct environment variables.
     ENV HOME /root
@@ -192,7 +192,7 @@ This will perform the following:
 
 For example:
 
-    $ docker run phusion/baseimage:<VERSION> /sbin/my_init -- ls
+    $ docker run stoo/baseimage:<VERSION> /sbin/my_init -- ls
     *** Running /etc/my_init.d/00_regen_ssh_host_keys.sh...
     No SSH host key available. Generating one...
     Creating SSH2 RSA key; this may take some time ...
@@ -211,7 +211,7 @@ You may find that the default invocation is too noisy. Or perhaps you don't want
 
 The following example runs `ls` without running the startup files and with less messages, while running all runit services:
 
-    $ docker run phusion/baseimage:<VERSION> /sbin/my_init --skip-startup-files --quiet -- ls
+    $ docker run stoo/baseimage:<VERSION> /sbin/my_init --skip-startup-files --quiet -- ls
     bin  boot  dev  etc  home  image  lib  lib64  media  mnt  opt  proc  root  run  sbin  selinux  srv  sys  tmp  usr  var
 
 <a name="environment_variables"></a>
@@ -265,7 +265,7 @@ Here is an example shell session showing you how the dumps look like:
 
     $ docker run -t -i \
       --env FOO=bar --env HELLO='my beautiful world' \
-      phusion/baseimage:<VERSION> /sbin/my_init -- \
+      stoo/baseimage:<VERSION> /sbin/my_init -- \
       bash -l
     ...
     *** Running bash -l...
@@ -325,7 +325,7 @@ Once you have the ID, look for its IP address with:
 
 Now SSH into the container as follows:
 
-    curl -o insecure_key -fSL https://github.com/phusion/baseimage-docker/raw/master/image/insecure_key
+    curl -o insecure_key -fSL https://github.com/timclassic/docker-baseimage/raw/master/image/insecure_key
     chmod 600 insecure_key
     ssh -i insecure_key root@<IP address>
 
@@ -372,7 +372,7 @@ Looking up the IP of a container and running an SSH command quickly becomes tedi
 
 First, install the tool on the Docker host:
 
-    curl --fail -L -O https://github.com/phusion/baseimage-docker/archive/master.tar.gz && \
+    curl --fail -L -O https://github.com/timclassic/docker-baseimage/archive/master.tar.gz && \
     tar xzf master.tar.gz && \
     sudo ./baseimage-docker-master/install-tools.sh
 
@@ -412,7 +412,7 @@ To verify that it works, [open a bash shell in your container](#inspecting), mod
     bash# ping my-test-domain.com
     ...should ping 127.0.0.1...
 
-**Note on apt-get upgrading:** if any Ubuntu updates overwrite libnss_files.so.2, then the workaround is removed. You have to re-enable it by running `/usr/bin/workaround-docker-2267`. To be safe, you should run this command every time after running `apt-get upgrade`.
+**Note on apt-get upgrading:** if any Debian updates overwrite libnss_files.so.2, then the workaround is removed. You have to re-enable it by running `/usr/bin/workaround-docker-2267`. To be safe, you should run this command every time after running `apt-get upgrade`.
 
 
 <a name="building"></a>
@@ -422,7 +422,7 @@ If for whatever reason you want to build the image yourself instead of downloadi
 
 Clone this repository:
 
-    git clone https://github.com/phusion/baseimage-docker.git
+    git clone https://github.com/timclassic/docker-baseimage.git
     cd baseimage-docker
 
 Start a virtual machine with Docker in it. You can use the Vagrantfile that we've already provided.
