@@ -23,7 +23,7 @@ ln -s /etc/container_environment.sh /etc/profile.d/
 $minimal_apt_get_install runit
 
 ## Install a syslog daemon.
-$minimal_apt_get_install syslog-ng-core
+$minimal_apt_get_install syslog-ng-core syslog-ng-mod-sql
 mkdir /etc/service/syslog-ng
 cp /build/runit/syslog-ng /etc/service/syslog-ng/run
 mkdir -p /var/lib/syslog-ng

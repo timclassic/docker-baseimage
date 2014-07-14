@@ -52,3 +52,5 @@ apt-get dist-upgrade -y --no-install-recommends
 $minimal_apt_get_install locales
 dpkg-reconfigure locales && locale-gen C.UTF-8 && /usr/sbin/update-locale LANG=C.UTF-8
 
+# Install Python 3
+$minimal_apt_get_install python3
